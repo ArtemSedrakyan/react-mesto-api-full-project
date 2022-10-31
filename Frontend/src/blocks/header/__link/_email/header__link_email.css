@@ -1,0 +1,14 @@
+.header__link_email {
+  margin: 0;
+  margin-right: 24px;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.22;
+  font-weight: 500;
+}
+
+@media screen and (max-width: 768px) {
+  .header__link_email {
+    display: none;
+  }
+}

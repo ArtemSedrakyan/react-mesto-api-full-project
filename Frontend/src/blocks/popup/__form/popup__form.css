@@ -1,0 +1,26 @@
+.popup__form {
+  box-sizing: border-box;
+  max-width: 430px;
+  width: calc(430px - 0.15417 * (1280px - 100vw));
+  margin: auto;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  background-color: #fff;
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, .15);
+  border-radius: 10px;
+  position: relative;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.21;
+  font-weight: 400;
+}
+
+
+@media screen and (max-width: 768px) {
+  .popup__form {
+    padding: 25px 22px;
+  }
+}
+

@@ -1,0 +1,18 @@
+form.dark-theme {
+  background-color: #000;
+}
+
+input.dark-theme {
+  color: #fff;
+  background-color: #000;
+  border-bottom: 2px solid #ccc;
+}
+
+button.dark-theme {
+  color: #000;
+  background-color: #fff;
+}
+
+h2.dark-theme {
+  color: #fff;
+}

@@ -1,0 +1,12 @@
+.page__element {
+  box-sizing: border-box;
+  max-width: 880px;
+  width: calc(880px - 0.62292 * (1280px - 100vw));
+  margin: 0 auto;
+}
+
+@media screen and (max-width: 768px) {
+  .header {
+    width: 100%;
+  }
+}

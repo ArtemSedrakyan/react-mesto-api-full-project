@@ -1,0 +1,25 @@
+form.user-form {
+  padding-top: 60px;
+}
+
+button.user-form {
+  margin-top: 186px;
+}
+
+h2.user-form {
+  text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+  form.user-form {
+    padding-top: 40px;
+  }
+
+  button.user-form {
+    margin-top: 143px;
+  }
+
+  h2.user-form {
+    margin-bottom: 10px;
+  }
+}

@@ -1,0 +1,9 @@
+.header__links {
+  display: flex;
+}
+
+@media screen and (max-width: 768px) {
+  .header__links {
+    margin-right: 30px;
+  }
+}

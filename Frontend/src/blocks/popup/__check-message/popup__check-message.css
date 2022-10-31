@@ -1,0 +1,14 @@
+.popup__check-message {
+  margin: 0 0 24px;
+  text-align: center;
+  font-size: 24px;
+  line-height: 1.21;
+  font-weight: 900;
+  color: #000;
+}
+
+@media screen and (max-width: 768px) {
+  .popup__check-message {
+    font-size: 20px;
+  }
+}

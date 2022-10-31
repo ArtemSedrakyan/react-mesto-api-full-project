@@ -1,0 +1,17 @@
+.element__place-name {
+  justify-self: flex-start;
+  align-self: baseline;
+  max-width: 215px;
+  width: 65%;
+  margin: 25px 0 31px 21px;
+  padding: 0;
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 1.21;
+  font-size: 24px;
+  font-weight: 900;
+  color: #000;
+}
+
