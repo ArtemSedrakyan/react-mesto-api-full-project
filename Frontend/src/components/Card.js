@@ -31,7 +31,7 @@ class Card extends React.Component {
         <h2 className="element__place-name">{this.props.card.name}</h2>
         <button className={`element__like-button ${this.isLiked() ? 'element__like-button_active' : ' '}`}
           type="button" aria-label="Лайк" onClick={this.handleLikeClick}>
-          <span className="element__like-counter">{this.props.card.likes.length}</span>
+          <p className="element__like-counter">{this.props.card.likes.length}</p>
         </button>
         <button className={`element__delete-button ${this.isOwn() ? 'element__delete-button_visible' : 'element__delete-button_hidden'}`}
           type="button" aria-label="Удалить карточку" onClick={this.handleDeleteClick}/>

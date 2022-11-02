@@ -155,7 +155,6 @@ useEffect(() => {
         setLoggedIn(true);
         setUserEmailOnHeader(email);
         history.push('/');
-        localStorage.setItem('jwt', res.token);
       }
     })
     .catch(() => {
@@ -164,10 +163,8 @@ useEffect(() => {
     })
   };
 
-  function checkToken() {
-    const token = localStorage.getItem('jwt');
-    if(token) {
-      mestoAuth.validityToken()
+  function checkToken(token) {
+      mestoAuth.validityToken(token)
       .then((res) => {
         if (res) {
           setUserEmailOnHeader(res.email);
@@ -178,12 +175,10 @@ useEffect(() => {
       .catch((err) => {
         console.log(err);
       });
-    }
   };
 
   const logoutProfile = async () => {
     await mestoAuth.signOut();
-    localStorage.removeItem('jwt');
     history.push('/sign-in');
     setLoggedIn(true);
   };
