@@ -14,6 +14,7 @@ class Api {
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
       method: 'GET',
+      credentials: 'include',
       headers: this._headers,
     })
     .then(this._checkResponse)
@@ -22,14 +23,16 @@ class Api {
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
       method: 'GET',
+      credentials: 'include',
       headers: this._headers,
     })
     .then(this._checkResponse)
   }
 
-  async patchProfileData(data) {
-    await fetch(`${this._baseUrl}/users/me`, {
+  patchProfileData(data) {
+    return fetch(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
+      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
         name: data.name,
@@ -42,6 +45,7 @@ class Api {
   addNewCard(data) {
     return fetch(`${this._baseUrl}/cards`, {
       method: 'POST',
+      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
         name: data.name,
@@ -54,14 +58,16 @@ class Api {
   deleteCard(cardId) {
     return fetch (`${this._baseUrl}/cards/${cardId}`, {
       method: 'DELETE',
+      credentials: 'include',
       headers: this._headers,
     })
     .then(this._checkResponse)
   }
 
-  async patchProfileAvatar(data) {
-    await fetch(`${this._baseUrl}/users/me/avatar`, {
+  patchProfileAvatar(data) {
+    return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: 'PATCH',
+      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
         avatar: data.avatar,
@@ -73,6 +79,7 @@ class Api {
   toggleLike(cardId, isLiked) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: isLiked ? 'DELETE' : 'PUT',
+      credentials: 'include',
       headers: this._headers
     })
     .then(this._checkResponse)

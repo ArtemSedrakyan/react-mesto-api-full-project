@@ -4,20 +4,16 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 class Card extends React.Component {
   static contextType = CurrentUserContext;
 
-  constructor(props) {
-    super(props);
-  };
-
   handleImgClick = () => {
     this.props.onCardClick(this.props.card);
   };
 
   isOwn() {
-    return this.props.card.owner._id === this.context._id;
+    return this.props.card.owner === this.context._id;
   };
 
   isLiked() {
-    return this.props.card.likes.some(like => like._id === this.context._id);
+    return this.props.card.likes.some(like => like === this.context._id);
   };
 
   handleLikeClick = () => {

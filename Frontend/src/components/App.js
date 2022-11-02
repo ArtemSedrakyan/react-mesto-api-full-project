@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { Route, Switch, Redirect, withRouter } from "react-router-dom";
 import Header from "./Header";
 import Main from "./Main";
@@ -16,189 +16,164 @@ import ProtectedRoute from "./ProtectedRoute";
 import InfoToolTip from "./InfoToolTip";
 import * as mestoAuth from '../utils/mestoAuth';
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+function App ({history}) {
 
-    this.state = {
-      isEditAvatarPopupOpen: false,
-      isEditProfileOpen: false,
-      isAddPlacePopupOpen: false,
-      isInfoToolTipPopupOpen: false,
-      selectedCard: { name: "", link: "" },
-      currentUser: { },
-      cards: [ ],
-      loggedIn: false,
-      regStatus: false,
-      checkImage: "",
-      checkMessage: "",
-      userEmailOnHeader: ""
-    };
-  }
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [isInfoToolTipPopupOpen, setIsInfoToolTipPopupOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({ name: "", link: "" });
+  const [currentUser, setCurrentUser] = useState({});
+  const [cards, setCards] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [regStatus, setRegStatus] = useState(false);
+  const [userEmailOnHeader, setUserEmailOnHeader] = useState("");
 
-  handleEditAvatarClick = () => {
-    this.setState({ isEditAvatarPopupOpen: true });
-  };
-
-  handleEditProfileClick = () => {
-    this.setState({ isEditProfileOpen: true });
-  };
-
-  handleAddPlaceClick = () => {
-    this.setState({ isAddPlacePopupOpen: true });
-  };
-
-  handleCardClick = (cardElement) => {
-    this.setState({ selectedCard: cardElement });
-  };
-
-  closeAllPopups = () => {
-    this.setState({
-      isEditAvatarPopupOpen: false,
-      isEditProfileOpen: false,
-      isAddPlacePopupOpen: false,
-      isInfoToolTipPopupOpen: false,
-      selectedCard: { name: "", link: "" },
-    });
-  };
-
-  componentDidMount() {
-    Promise.all([api.getUserInfo(), api.getInitialCards()])
-    .then(([userData, cards]) => {
-      this.setState({
-        currentUser: userData,
-        cards: cards
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-    this.checkToken();
-  };
-
-  handleUpdateUser = (data) => {
-    api.patchProfileData(data)
-    .then(() => {
-      this.setState({
-        currentUser: this.state.currentUser
-      })
-      api.getUserInfo()
-        .then((userData) => {
-          this.setState({
-            currentUser: userData,
-          });
-          this.closeAllPopups();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  };
-
-  handleUpdateAvatar = (data) => {
-    api.patchProfileAvatar(data)
-    .then(() => {
-      api.getUserInfo()
-      .then((userData) => {
-        this.setState({
-          currentUser: userData,
-        });
-        this.closeAllPopups();
+useEffect(() => {
+    if (loggedIn) {
+      Promise.all([api.getUserInfo(), api.getInitialCards()])
+      .then(([userData, cardsData]) => {
+        setCurrentUser(userData);
+        setCards(cardsData.reverse());
       })
       .catch((err) => {
         console.log(err);
       });
+    }
+
+  }, [loggedIn]);
+
+  useEffect(() => {
+    checkToken();
+  }, []);
+
+  function handleEditAvatarClick() {
+    setIsEditAvatarPopupOpen(true);
+  };
+
+  function handleEditProfileClick() {
+    setIsEditProfileOpen(true);
+  };
+
+  function handleAddPlaceClick() {
+    setIsAddPlacePopupOpen(true);
+  };
+
+  function handleCardClick(cardElement) {
+    setSelectedCard(cardElement);
+  };
+
+  function closeAllPopups() {
+    setIsEditAvatarPopupOpen(false);
+    setIsEditProfileOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setIsInfoToolTipPopupOpen(false);
+    setSelectedCard({ name: "", link: "" });
+  };
+
+  function handleUpdateUser(data) {
+    api.patchProfileData(data)
+    .then((res) => {
+      setCurrentUser(res);
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      closeAllPopups();
     });
   };
 
-  handleCardLike = (card) => {
-    const isLiked = card.likes.some(like => like._id === this.state.currentUser._id);
+  function handleUpdateAvatar(data) {
+    api.patchProfileAvatar(data)
+    .then((res) => {
+      setCurrentUser(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      closeAllPopups();
+    });
+  };
+
+  function handleCardLike(card) {
+    const isLiked = card.likes.some(like => like === currentUser._id);
 
     api.toggleLike(card._id, isLiked)
     .then((newCard) => {
-      this.setState({
-        cards: this.state.cards.map(
+      setCards(cards.map(
           (stateElement) => stateElement._id === card._id ? newCard : stateElement
         )
-      });
+      );
     })
     .catch((err) => {
       console.log(err);
     });
   };
 
-  handleCardDelete = (card) => {
+  function handleCardDelete(card) {
     api.deleteCard(card._id)
     .then(() => {
-      this.setState({
-        cards: this.state.cards.filter((stateElement) => stateElement._id !== card._id)
-      })
+      setCards(cards.filter((stateElement) => stateElement._id !== card._id));
     })
     .catch((err) => {
       console.log(err);
     });
   };
 
-  handleAddPlaceSubmit = (card) => {
+  function handleAddPlaceSubmit(card) {
     api.addNewCard(card)
     .then((newCard) => {
-      this.setState({
-        cards: [newCard, ...this.state.cards]
-      });
-      this.closeAllPopups();
+      setCards([newCard, ...cards]);
+      closeAllPopups();
     })
     .catch((err) => {
       console.log(err);
     });
   };
 
-  onRegister = (email, password) => {
+  function onRegister(email, password) {
     mestoAuth.register(password, email)
     .then((res) => {
-      this.setState({isInfoToolTipPopupOpen: true});
+      setIsInfoToolTipPopupOpen(true);
       if (res) {
-        this.setState({regStatus: true})
-        this.props.history.push('/sign-in');
+        setRegStatus(true);
+        history.push('/sign-in');
       }
     })
     .catch(() => {
-      this.setState({regStatus: false});
-      this.setState({isInfoToolTipPopupOpen: true});
+      setRegStatus(false);
+      setIsInfoToolTipPopupOpen(true);
     })
   };
 
-  onLogin = (email, password) => {
+  function onLogin(email, password) {
     mestoAuth.authorize(email, password)
     .then((res) => {
       if(res) {
-        this.setState({loggedIn: true});
-        this.setState({userEmailOnHeader: email});
-        this.props.history.push('/');
+        setLoggedIn(true);
+        setUserEmailOnHeader(email);
+        history.push('/');
         localStorage.setItem('jwt', res.token);
       }
     })
     .catch(() => {
-      this.setState({regStatus: false});
-      this.setState({isInfoToolTipPopupOpen: true});
+      setRegStatus(false);
+      setIsInfoToolTipPopupOpen(true);
     })
   };
 
-  checkToken = () => {
+  function checkToken() {
     const token = localStorage.getItem('jwt');
     if(token) {
-      mestoAuth.validityToken(token)
+      mestoAuth.validityToken()
       .then((res) => {
         if (res) {
-          this.setState({userEmailOnHeader: res.data.email});
+          setUserEmailOnHeader(res.email);
         };
-        this.setState({loggedIn: true})
-        this.props.history.push('/');
+        setLoggedIn(true);
+        history.push('/');
       })
       .catch((err) => {
         console.log(err);
@@ -206,81 +181,77 @@ class App extends React.Component {
     }
   };
 
-  logoutProfile = async () => {
+  const logoutProfile = async () => {
     await mestoAuth.signOut();
     localStorage.removeItem('jwt');
-    this.props.history.push('/sign-in');
-    this.setState({loggedIn: false})
+    history.push('/sign-in');
+    setLoggedIn(true);
   };
 
-  render() {
     return (
-      <CurrentUserContext.Provider value={this.state.currentUser}>
+      <CurrentUserContext.Provider value={currentUser}>
         <Header
-          userEmailOnHeader={this.state.userEmailOnHeader}
-          logoutProfile={this.logoutProfile}
+          userEmailOnHeader={userEmailOnHeader}
+          logoutProfile={logoutProfile}
         />
         <Switch>
           <ProtectedRoute
             exact
             path="/"
-            loggedIn={this.state.loggedIn}
+            loggedIn={loggedIn}
             component={Main}
-            onEditAvatar={this.handleEditAvatarClick}
-            onEditProfile={this.handleEditProfileClick}
-            onAddPlace={this.handleAddPlaceClick}
-            onCardView={this.handleCardClick}
-            cards={this.state.cards}
-            onCardLike={this.handleCardLike}
-            onCardDelete={this.handleCardDelete}
+            onEditAvatar={handleEditAvatarClick}
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onCardView={handleCardClick}
+            cards={cards}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
           />
           <Route path="/sign-up">
             <Register
-              onRegister={this.onRegister}
+              onRegister={onRegister}
             />
           </Route>
           <Route path="/sign-in">
             <Login
-              onLogin={this.onLogin}
+              onLogin={onLogin}
             />
           </Route>
           <Route exact path="/">
-            {this.state.loggedIn ?
+            {loggedIn ?
               <Redirect to="/" /> :
               <Redirect to="/sign-in" />}
           </Route>
         </Switch>
         <EditProfilePopup
-          isOpen={this.state.isEditProfileOpen}
-          onClose={this.closeAllPopups}
-          onUpdateUser={this.handleUpdateUser}
+          isOpen={isEditProfileOpen}
+          onClose={closeAllPopups}
+          onUpdateUser={handleUpdateUser}
         />
         <AddPlacePopup
-          isOpen={this.state.isAddPlacePopupOpen}
-          onClose={this.closeAllPopups}
-          onAddPlace={this.handleAddPlaceSubmit}
+          isOpen={isAddPlacePopupOpen}
+          onClose={closeAllPopups}
+          onAddPlace={handleAddPlaceSubmit}
         />
         <PopupWithForm name="confirm" title="Вы уверены?" />
         <EditAvatarPopup
-          isOpen={this.state.isEditAvatarPopupOpen}
-          onClose={this.closeAllPopups}
-          onUpdateAvatar={this.handleUpdateAvatar}
+          isOpen={isEditAvatarPopupOpen}
+          onClose={closeAllPopups}
+          onUpdateAvatar={handleUpdateAvatar}
         />
         <ImagePopup
-          onClose={this.closeAllPopups}
-          card={this.state.selectedCard}
+          onClose={closeAllPopups}
+          card={selectedCard}
         />
         <InfoToolTip
-          isOpen={this.state.isInfoToolTipPopupOpen}
-          onClose={this.closeAllPopups}
-          checkImage={this.state.checkImage}
-          checkMessage={this.state.checkMessage}
-          status={this.state.regStatus}
+          isOpen={isInfoToolTipPopupOpen}
+          onClose={closeAllPopups}
+          status={regStatus}
         />
         <Footer />
       </CurrentUserContext.Provider>
     );
-  };
 };
 
 export default withRouter(App);
